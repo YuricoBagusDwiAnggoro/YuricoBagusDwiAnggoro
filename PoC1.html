@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of Concept - Ring Network Topology | Yurico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030303;
+            color: #ededed;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(52, 211, 153, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px;
+            background-attachment: fixed;
+        }
+
+        .font-mono {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bento-card {
+            background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(14, 14, 17, 0.9) 100%);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        .bento-card:hover {
+            border-color: rgba(52, 211, 153, 0.2);
+            box-shadow: 0 10px 40px -10px rgba(52, 211, 153, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .putty-window {
+            background-color: #09090b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .putty-header {
+            background-color: #18181b;
+            border-bottom: 1px solid #27272a;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .putty-tab {
+            background: #09090b;
+            color: #38bdf8;
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
+            padding: 4px 16px;
+            border-radius: 6px 6px 0 0;
+            border-top: 2px solid #38bdf8;
+            box-shadow: 0 -2px 10px rgba(56, 189, 248, 0.1);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #34d399;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+
+        .img-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .img-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        /* Custom scrollbar untuk kotak kode/terminal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(52, 211, 153, 0.4);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 lg:p-12 selection:bg-emerald-500/30 selection:text-emerald-200">
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+        <a href="landingpage.html"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-sm font-medium text-gray-300 hover:text-white transition-all backdrop-blur-sm group">
+            <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+            Kembali ke Portofolio
+        </a>
+        <div class="text-xs font-mono text-gray-500 hidden sm:flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500/50"></span>
+            PROJECT_ID: GNS3-ENT-RING-01
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto space-y-10">
+
+        <header class="bento-card relative overflow-hidden">
+            <div
+                class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none">
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -ml-20 -mb-20 pointer-events-none">
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+                <div>
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <span class="badge bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2"></span>
+                            Validated in GNS3
+                        </span>
+                        <span class="badge bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                            MikroTik RouterOS v7
+                        </span>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
+                        Proof of Concept: <br class="hidden md:block" />
+                        <span class="text-gradient">Ring Network Topology</span>
+                    </h1>
+                    <p class="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed">
+                        Dokumentasi komprehensif hasil simulasi dan verifikasi teknis untuk infrastruktur ring 5 Router
+                        berketersediaan tinggi (High Availability), 10 segmen VLAN, Inter-VLAN Routing VLSM, dan
+                        QoS.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Topology Image (Spans 2 cols) -->
+            <div class="bento-card lg:col-span-2 flex flex-col justify-between group">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 20l-5.447-2.724A2 2 0 013 15.482V4.518a2 2 0 011.553-1.943L9 1.118l6 3 5.447-2.724A2 2 0 0122 3.336v10.964a2 2 0 01-1.553 1.943L15 18.882l-6-3z">
+                                    </path>
+                                </svg>
+                            </div>
+                            Arsitektur Topologi Ring (5 Routers)
+                        </h2>
+                        <span
+                            class="text-xs text-gray-500 font-mono bg-black/30 px-3 py-1 rounded-full border border-gray-800">GNS3
+                            Canvas</span>
+                    </div>
+                    <div
+                        class="img-container bg-black/60 p-2 flex items-center justify-center transition-transform duration-500 group-hover:scale-[1.01]">
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\TOPOLOGI.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x450/09090b/34d399?text=GNS3+5-Router+Ring+Topology';"
+                            alt="Topologi Ring GNS3" class="w-full h-auto object-contain rounded-lg">
+                    </div>
+                </div>
+
+                <!-- Metrics Row -->
+                <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Nodes</p>
+                        <p class="text-xl font-bold text-emerald-400 font-mono">5 Unit</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">VLANs</p>
+                        <p class="text-xl font-bold text-blue-400 font-mono">10 VLANs</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Subnet</p>
+                        <p class="text-xl font-bold text-purple-400 font-mono">VLSM</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Clients</p>
+                        <p class="text-xl font-bold text-amber-400 font-mono">14 PC</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bento-card flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                                </path>
+                            </svg>
+                        </div>
+                        Pemetaan Subnet
+                    </h2>
+
+                    <div class="space-y-4 text-xs max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Site R1 -->
+                        <div
+                            class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2 hover:border-emerald-500/30 transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-emerald-400 text-sm">R1 Site (SW1)</span>
+                                <span
+                                    class="font-mono text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-1 rounded border border-emerald-500/20">VLAN
+                                    2-5</span>
+                            </div>
+                            <div class="text-gray-400 font-mono space-y-1 text-[11px]">
+                                <p class="flex justify-between"><span>IT (VLAN 2)</span> <span
+                                        class="text-gray-300">192.168.10.0/25</span></p>
+                                <p class="flex justify-between"><span>Marketing (VLAN 3)</span> <span
+                                        class="text-gray-300">192.168.10.128/25</span></p>
+                                <p class="flex justify-between"><span>HRD (VLAN 4)</span> <span
+                                        class="text-gray-300">192.168.20.0/25</span></p>
+                                <p class="flex justify-between"><span>Sosmed (VLAN 5)</span> <span
+                                        class="text-gray-300">192.168.20.128/25</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Site R2 -->
+                        <div
+                            class="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl space-y-2 hover:border-blue-500/30 transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-blue-400 text-sm">R2 Site (SW2)</span>
+                                <span
+                                    class="font-mono text-[10px] bg-blue-500/10 text-blue-300 px-2 py-1 rounded border border-blue-500/20">VLAN
+                                    6-9</span>
+                            </div>
+                            <div class="text-gray-400 font-mono space-y-1 text-[11px]">
+                                <p class="flex justify-between"><span>LAB 1 (VLAN 6)</span> <span
+                                        class="text-gray-300">192.168.11.0/25</span></p>
+                                <p class="flex justify-between"><span>LAB 2 (VLAN 7)</span> <span
+                                        class="text-gray-300">192.168.11.128/25</span></p>
+                                <p class="flex justify-between"><span>LAB 3 (VLAN 8)</span> <span
+                                        class="text-gray-300">192.168.12.0/25</span></p>
+                                <p class="flex justify-between"><span>LAB 4 (VLAN 9)</span> <span
+                                        class="text-gray-300">192.168.12.128/25</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Site R3, R4, R5 -->
+                        <div
+                            class="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl space-y-2 hover:border-purple-500/30 transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-purple-400 text-sm">R3, R4, R5</span>
+                                <span
+                                    class="font-mono text-[10px] bg-purple-500/10 text-purple-300 px-2 py-1 rounded border border-purple-500/20">VLAN
+                                    10-11</span>
+                            </div>
+                            <div class="text-gray-400 font-mono space-y-1 text-[11px]">
+                                <p class="flex justify-between"><span>Security (VLAN 10)</span> <span
+                                        class="text-gray-300">192.168.13.0/25</span></p>
+                                <p class="flex justify-between"><span>Kesehatan (VLAN 11)</span> <span
+                                        class="text-gray-300">192.168.13.128/27</span></p>
+                                <p class="flex justify-between"><span>Div OB (R4)</span> <span
+                                        class="text-gray-300">192.168.13.160/27</span></p>
+                                <p class="flex justify-between"><span>Pemeliharaan (R5)</span> <span
+                                        class="text-gray-300">192.168.13.192/27</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Ring Link Backbone -->
+                        <div
+                            class="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl space-y-2 hover:border-amber-500/30 transition-colors">
+                            <span class="font-bold text-amber-400 text-sm">Ring Links (/30)</span>
+                            <div class="text-gray-400 font-mono text-[11px] space-y-1">
+                                <p>R1-R2: 192.168.1.0/30 | R2-R3: 192.168.1.4/30</p>
+                                <p>R3-R4: 192.168.1.8/30 | R4-R5: 192.168.1.12/30</p>
+                                <p>R5-R1: 192.168.1.16/30</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-800 text-xs text-gray-400 bg-gray-900/30 p-3 rounded-lg">
+                    <p class="leading-relaxed">
+                        <span class="text-emerald-400 font-semibold">Tujuan Subnetting:</span> Efisiensi IP berbasis
+                        VLSM (/25, /27, /30) & isolasi lalu lintas antar divisi.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-8 mt-12">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 font-mono shadow-[0_0_15px_rgba(52,211,153,0.15)]">
+                    01</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Validasi Inter-VLAN Routing</h2>
+                    <p class="text-sm text-gray-400 mt-1">Pengujian konektivitas antarnode pada segmen subnet yang
+                        berbeda (Layer 3).</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <!-- Terminal PuTTY Replica (Spans 7 cols) -->
+                <div class="lg:col-span-7 putty-window flex flex-col justify-between">
+                    <div>
+                        <!-- PuTTY Header -->
+                        <div class="putty-header">
+                            <div class="flex items-center gap-3">
+                                <span class="putty-tab flex items-center gap-2">
+                                    <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z" />
+                                    </svg>
+                                    PC2 (192.168.10.254)
+                                </span>
+                                <span
+                                    class="text-[10px] text-gray-500 font-mono tracking-wide uppercase">Solar-PuTTY</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
+                            </div>
+                        </div>
+
+                        <!-- Terminal Content -->
+                        <div class="p-5 font-mono text-[13px] text-gray-300 space-y-4 leading-relaxed overflow-x-auto">
+                            <!-- Network Configuration Output -->
+                            <div class="text-gray-400 space-y-1 border-b border-gray-800 pb-4">
+                                <p><span class="text-blue-400 w-32 inline-block">IP/MASK</span> : 192.168.10.254/25</p>
+                                <p><span class="text-blue-400 w-32 inline-block">GATEWAY</span> : 192.168.10.129</p>
+                                <p><span class="text-blue-400 w-32 inline-block">DNS</span> : 8.8.8.8</p>
+                                <p><span class="text-blue-400 w-32 inline-block">DHCP SERVER</span> : 192.168.10.129</p>
+                                <p><span class="text-blue-400 w-32 inline-block">MAC</span> : 00:50:79:66:68:03</p>
+                            </div>
+
+                            <!-- Ping Command Executed -->
+                            <div class="space-y-1.5">
+                                <p class="text-white">PC2> <span class="text-emerald-400 font-semibold">ping
+                                        192.168.10.126</span></p>
+                                <p class="text-gray-300">84 bytes from 192.168.10.126 icmp_seq=1 <span
+                                        class="text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">ttl=63</span>
+                                    time=50.650 ms</p>
+                                <p class="text-gray-300">84 bytes from 192.168.10.126 icmp_seq=2 <span
+                                        class="text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">ttl=63</span>
+                                    time=26.562 ms</p>
+                                <p class="text-gray-300">84 bytes from 192.168.10.126 icmp_seq=3 <span
+                                        class="text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">ttl=63</span>
+                                    time=33.786 ms</p>
+                                <p class="text-gray-300">84 bytes from 192.168.10.126 icmp_seq=4 <span
+                                        class="text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">ttl=63</span>
+                                    time=16.444 ms</p>
+                                <p class="text-gray-300">84 bytes from 192.168.10.126 icmp_seq=5 <span
+                                        class="text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">ttl=63</span>
+                                    time=16.214 ms</p>
+                                <p class="text-white mt-2">PC2> <span class="cursor-blink"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="p-3 bg-black/40 border-t border-gray-800 text-[11px] font-mono text-emerald-400 flex justify-between items-center px-5">
+                        <span class="flex items-center gap-2"><span
+                                class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 5/5 Packets Received (0%
+                            Loss)</span>
+                        <span class="text-gray-500">RTT Avg: 28.73ms</span>
+                    </div>
+                </div>
+
+                <!-- Technical Analysis Card (Spans 5 cols) -->
+                <div class="lg:col-span-5 bento-card flex flex-col justify-center space-y-6">
+                    <div
+                        class="inline-flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20 w-max">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Analisis Empiris
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Mengapa <span class="text-emerald-400">TTL=63</span>
+                        Sangat Krusial?</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Pada emulator perangkat end-point (VPCS GNS3), nilai bawaan <code
+                            class="bg-gray-800 text-emerald-400 px-1.5 py-0.5 rounded font-mono text-xs">Time To Live (TTL)</code>
+                        saat paket ICMP dipancarkan adalah <strong>64</strong>.
+                    </p>
+                    <div class="bg-gray-900/50 p-5 rounded-xl border border-gray-800 space-y-3">
+                        <p class="text-gray-200 text-sm font-semibold flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            Mekanisme TTL Decay:
+                        </p>
+                        <ul
+                            class="text-gray-400 text-sm space-y-2 leading-relaxed ml-2 border-l-2 border-gray-800 pl-4">
+                            <li>Paket dikirim PC2 dengan <span class="text-white">TTL = 64</span>.</li>
+                            <li>Router Gateway memproses paket & menurunkan TTL sebesar 1 (<code
+                                    class="text-emerald-400 font-mono bg-black/50 px-1 rounded">64 - 1 = 63</code>).
+                            </li>
+                            <li>Paket diterima PC1 dengan <span class="text-white">sisa TTL = 63</span>.</li>
+                        </ul>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed border-l-4 border-emerald-500 pl-4">
+                        Hal ini memvalidasi bahwa lalu lintas antar-VLAN telah melalui proses <strong>Inter-VLAN Routing
+                            di Layer 3</strong>, bukan sekadar Switching di Layer 2.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Image Container Bukti Ping -->
+            <div class="bento-card">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Screenshot Bukti: Inter-VLAN Ping (VPCS)
+                    </h3>
+                    <span class="text-[10px] text-gray-500 font-mono bg-black/30 px-2 py-1 rounded">GNS3 Terminal</span>
+                </div>
+                <div class="img-container bg-black/50 p-2 flex items-center justify-center">
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC\layer 1.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1000x300/09090b/34d399?text=Insert+Screenshot+Ping+Inter-VLAN+Disini';"
+                        alt="Bukti Ping Inter-VLAN" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-8 mt-16">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 font-mono shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                    02</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Validasi Ring Failover Routing</h2>
+                    <p class="text-sm text-gray-400 mt-1">Verifikasi perpindahan jalur melingkar (R1-R2-R3-R4-R5) secara
+                        otomatis saat link terputus.</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+
+                <!-- Fase 1: Normal Trace -->
+                <div class="bento-card flex flex-col lg:flex-row gap-6 items-center group">
+                    <div class="w-full lg:w-1/3 space-y-4">
+                        <span class="badge bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                            Fase 1: Jalur Utama (Shortest Path)
+                        </span>
+                        <h3 class="text-xl font-bold text-white">Trace PC2 ke PC11 (Normal)</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Pada kondisi normal, saat <b>PC2</b> melakukan traceroute ke <b>PC11 (192.168.13.190)</b>,
+                            paket memilih rute terpendek melewati 3 <i>hop</i> router. Hal ini terjadi karena router
+                            memprioritaskan rute dengan <code
+                                class="text-blue-400 font-mono bg-black/50 px-1 rounded">Distance terkecil</code> pada
+                            routing table.
+                        </p>
+                        <div
+                            class="font-mono text-[11px] text-gray-400 bg-[#09090b] p-3 rounded-lg border border-gray-800 shadow-inner">
+                            <span class="text-blue-400 font-bold">Jalur yang dilalui:</span><br>
+                            1. 192.168.10.129 (R1)<br>
+                            2. 192.168.1.17 (R5)<br>
+                            3. 192.168.1.13 (R4)
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 img-container bg-black/60 p-2">
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC\normalTrace.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x400/09090b/3b82f6?text=Image+1:+Normal+Trace';"
+                            alt="Trace PC2 ke PC11 Jalur Normal"
+                            class="w-full h-auto object-contain rounded-lg group-hover:scale-[1.01] transition-transform duration-500">
+                    </div>
+                </div>
+
+                <!-- Fase 2: Link Failure -->
+                <div class="bento-card flex flex-col lg:flex-row-reverse gap-6 items-center group">
+                    <div class="w-full lg:w-1/3 space-y-4">
+                        <span
+                            class="badge bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-2 w-max">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            Fase 2: Link Failure (Kabel Putus)
+                        </span>
+                        <h3 class="text-xl font-bold text-white">Simulasi Pemutusan Link</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Dilakukan skenario gangguan berupa pemutusan kabel fisik (link cut) pada segmen backbone
+                            <code class="text-red-400 font-mono bg-black/50 px-1 rounded">192.168.1.12/30</code> yang
+                            menghubungkan <b>Router 4</b> dan <b>Router 5</b>, membuat jalur utama terputus total.
+                        </p>
+                    </div>
+                    <div class="w-full lg:w-2/3 img-container bg-black/60 p-2">
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC\cabut kabel.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x400/09090b/ef4444?text=Image+2:+Pemutusan+Kabel';"
+                            alt="Topologi Link Cut R4-R5"
+                            class="w-full h-auto object-contain rounded-lg border border-red-500/20 group-hover:border-red-500/50 transition-colors duration-500">
+                    </div>
+                </div>
+
+                <!-- Fase 3: Failover Route -->
+                <div class="bento-card flex flex-col lg:flex-row gap-6 items-center group">
+                    <div class="w-full lg:w-1/3 space-y-4">
+                        <span class="badge bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                            Fase 3: Auto-Failover (Redundancy)
+                        </span>
+                        <h3 class="text-xl font-bold text-white">Trace PC2 ke PC11 (Failover)</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Sistem redundansi sukses! Traceroute ulang menunjukkan bahwa paket secara otomatis dialihkan
+                            memutar seluruh topologi Ring (melewati 4 <i>hop</i> router). Router menggunakan *Floating
+                            Static Route* dengan nilai <i>distance</i> yang lebih besar.
+                        </p>
+                        <div
+                            class="font-mono text-[11px] text-gray-400 bg-[#09090b] p-3 rounded-lg border-l-2 border-emerald-500 shadow-inner">
+                            <span class="text-emerald-400 font-bold">Jalur baru (Memutar):</span><br>
+                            1. 192.168.10.129 (R1)<br>
+                            2. 192.168.1.2 (R2)<br>
+                            3. 192.168.1.6 (R3)<br>
+                            4. 192.168.1.10 (R4)
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 img-container bg-black/60 p-2">
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC\failover.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x400/09090b/34d399?text=Image+3:+Trace+Failover';"
+                            alt="Trace PC2 ke PC11 Jalur Failover"
+                            class="w-full h-auto object-contain rounded-lg group-hover:scale-[1.01] transition-transform duration-500">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="space-y-8 mt-16">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 font-mono shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+                    03</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Quality of Service (QoS)</h2>
+                    <p class="text-sm text-gray-400 mt-1">Manajemen bandwidth & prioritas trafik khusus aplikasi Video
+                        Conference.</p>
+                </div>
+            </div>
+
+            <div class="bento-card grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-5">
+                    <h3 class="text-xl font-bold text-white">Priority & Packet Marking</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                        Menggunakan fitur <code
+                            class="text-purple-400 font-mono bg-purple-500/10 px-1.5 py-0.5 rounded">Mangle</code> dan
+                        <code class="text-purple-400 font-mono bg-purple-500/10 px-1.5 py-0.5 rounded">Queue Tree</code>
+                        RouterOS, trafik rapat Zoom ditandai dan diberikan prioritas tertinggi (Priority 1). Hal ini
+                        mencegah latency tinggi saat jaringan sedang padat.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <span
+                            class="px-4 py-2 bg-gray-900 border border-gray-700 text-gray-300 rounded-xl text-xs font-mono shadow-inner">Mangle:
+                            Zoom-Packet</span>
+                        <span
+                            class="px-4 py-2 bg-purple-500/10 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-mono shadow-[0_0_10px_rgba(168,85,247,0.1)]">Priority:
+                            1 (High)</span>
+                    </div>
+
+                    <!-- Mangle Code -->
+                    <div
+                        class="bg-[#09090b] p-4 rounded-xl border border-gray-800 font-mono text-xs space-y-2 mt-4 shadow-inner">
+                        <p class="text-gray-600">// Marking UDP Ports for Zoom</p>
+                        <p class="text-purple-400">/ip firewall mangle</p>
+                        <p class="text-gray-300 leading-relaxed">add chain=prerouting dst-port=3478-3481,8801-8810
+                            protocol=udp action=mark-packet new-packet-mark=Zoom-Traffic passthrough=no</p>
+                    </div>
+                </div>
+
+                <div class="img-container bg-black/50 p-2">
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC\QoS.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/800x600/09090b/a855f7?text=Winbox+Queue+Tree';"
+                        alt="Bukti QoS Queue Tree" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+        </section>
+
+        <section class="bento-card space-y-6 mt-16 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] pointer-events-none">
+            </div>
+
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800 pb-5 relative z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Script Konfigurasi Inti (R1 &amp; R2)</h3>
+                    <p class="text-sm text-gray-400 mt-1">Potongan RouterOS CLI yang diterapkan pada topologi (Main
+                        &amp; Lab Segment).</p>
+                </div>
+                <button onclick="copyConfigScript(this)"
+                    class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-xl transition-all flex items-center gap-2 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                    <span>Salin Script</span>
+                </button>
+            </div>
+
+            <div class="relative z-10">
+                <div class="absolute top-4 right-4 flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-gray-700"></div>
+                    <div class="w-3 h-3 rounded-full bg-gray-700"></div>
+                    <div class="w-3 h-3 rounded-full bg-gray-700"></div>
+                </div>
+                <pre id="configCode"
+                    class="font-mono text-[13px] text-gray-300 bg-[#09090b] p-6 rounded-xl border border-gray-800 overflow-x-auto overflow-y-auto max-h-[600px] leading-relaxed shadow-inner custom-scrollbar">
+<span class="text-emerald-400"># =========================================================</span>
+<span class="text-emerald-400"># 1. KONFIGURASI ROUTER 1 (R1 - CORE/GATEWAY)</span>
+<span class="text-emerald-400"># =========================================================</span>
+<span class="text-blue-400 font-semibold">/interface ethernet</span>
+set [ find default-name=ether4 ] disable-running-check=no name=ether1
+set [ find default-name=ether5 ] disable-running-check=no name=ether2
+set [ find default-name=ether1 ] disable-running-check=no name=ether3
+set [ find default-name=ether2 ] disable-running-check=no name=ether4
+set [ find default-name=ether3 ] disable-running-check=no name=ether5
+set [ find default-name=ether6 ] disable-running-check=no
+set [ find default-name=ether7 ] disable-running-check=no
+set [ find default-name=ether8 ] disable-running-check=no
+set [ find default-name=ether9 ] disable-running-check=no
+set [ find default-name=ether10 ] disable-running-check=no
+set [ find default-name=ether11 ] disable-running-check=no
+set [ find default-name=ether12 ] disable-running-check=no
+set [ find default-name=ether13 ] disable-running-check=no
+set [ find default-name=ether14 ] disable-running-check=no
+set [ find default-name=ether15 ] disable-running-check=no
+set [ find default-name=ether16 ] disable-running-check=no
+set [ find default-name=ether17 ] disable-running-check=no
+set [ find default-name=ether18 ] disable-running-check=no
+set [ find default-name=ether19 ] disable-running-check=no
+set [ find default-name=ether20 ] disable-running-check=no
+<span class="text-blue-400 font-semibold">/interface vlan</span>
+add interface=ether3 name="jalur IT" vlan-id=2
+add interface=ether3 name="jalur gudang" vlan-id=5
+add interface=ether3 name="jalur hrd" vlan-id=4
+add interface=ether3 name="jalur marketing" vlan-id=3
+<span class="text-blue-400 font-semibold">/ip pool</span>
+add name=dhcp_pool0 ranges=192.168.10.2-192.168.10.126
+add name=dhcp_pool1 ranges=192.168.10.2-192.168.10.126
+add name=dhcp_pool2 ranges=192.168.10.130-192.168.10.254
+add name=dhcp_pool3 ranges=192.168.20.2-192.168.20.126
+add name=dhcp_pool4 ranges=192.168.20.130-192.168.20.254
+<span class="text-blue-400 font-semibold">/ip dhcp-server</span>
+add address-pool=dhcp_pool1 interface="jalur IT" name=dhcp1
+add address-pool=dhcp_pool2 interface="jalur marketing" name=dhcp2
+add address-pool=dhcp_pool3 interface="jalur hrd" name=dhcp3
+add address-pool=dhcp_pool4 interface="jalur gudang" name=dhcp4
+<span class="text-blue-400 font-semibold">/queue tree</span>
+add max-limit=1M name=Parent_IT parent=global priority=1
+add limit-at=300k max-limit=1M name="child download" packet-mark=\
+    "Packet Download" parent=Parent_IT priority=2
+add limit-at=700k max-limit=1M name="child meeting" packet-mark=\
+    "Paket - meeting" parent=Parent_IT priority=1
+<span class="text-blue-400 font-semibold">/routing ospf instance</span>
+add disabled=no name="OSPF R1" originate-default=if-installed router-id=\
+    1.1.1.1
+<span class="text-blue-400 font-semibold">/routing ospf area</span>
+add disabled=no instance="OSPF R1" name="area 0"
+<span class="text-blue-400 font-semibold">/ip address</span>
+add address=192.168.10.1/25 interface="jalur IT" network=192.168.10.0
+add address=192.168.10.129/25 interface="jalur marketing" network=\
+    192.168.10.128
+add address=192.168.20.1/25 interface="jalur hrd" network=192.168.20.0
+add address=192.168.20.129/25 interface="jalur gudang" network=192.168.20.128
+add address=192.168.1.1/30 comment="gateway r2" interface=ether20 network=\
+    192.168.1.0
+add address=192.168.1.18/30 comment="Gateway R5" interface=ether4 network=\
+    192.168.1.16
+add address=192.168.100.2/24 comment="GW OPNsense" interface=ether1 network=\
+    192.168.100.0
+<span class="text-blue-400 font-semibold">/ip dhcp-client</span>
+add interface=ether2
+<span class="text-blue-400 font-semibold">/ip dhcp-server network</span>
+add address=192.168.10.0/25 dns-server=8.8.8.8 gateway=192.168.10.1
+add address=192.168.10.128/25 dns-server=8.8.8.8 gateway=192.168.10.129
+add address=192.168.20.0/25 dns-server=8.8.8.8 gateway=192.168.20.1
+add address=192.168.20.128/25 dns-server=8.8.8.8 gateway=192.168.20.129
+<span class="text-blue-400 font-semibold">/ip dns</span>
+set servers=8.8.8.8
+<span class="text-blue-400 font-semibold">/ip firewall mangle</span>
+add action=mark-packet chain=forward dst-port=80,443 new-packet-mark=\
+    "Packet Download" protocol=tcp
+add action=mark-packet chain=forward new-packet-mark="Paket - meeting" \
+    protocol=icmp
+<span class="text-blue-400 font-semibold">/ip firewall nat</span>
+add action=masquerade chain=srcnat out-interface=ether2
+<span class="text-blue-400 font-semibold">/ip route</span>
+add comment="R1 &gt; LAB1&amp;2" disabled=yes dst-address=192.168.11.0/24 gateway=\
+    192.168.1.2 routing-table=main
+add comment="R1 &gt; LAB3&amp;4" disabled=yes dst-address=192.168.12.0/24 gateway=\
+    192.168.1.2 routing-table=main
+add comment="R1 &gt; LAB1&amp;2 (backup)" disabled=yes distance=2 dst-address=\
+    192.168.11.0/24 gateway=192.168.1.17 routing-table=main
+add comment="R1 &gt; LAB3&amp;4 (backup)" disabled=yes distance=2 dst-address=\
+    192.168.12.0/24 gateway=192.168.1.17 routing-table=main scope=30 \
+    target-scope=10
+add comment="R1 &gt; Security" disabled=yes dst-address=192.168.13.0/25 gateway=\
+    192.168.1.2 routing-table=main
+add comment="R1 &gt; Security (backup)" disabled=yes distance=2 dst-address=\
+    192.168.13.0/25 gateway=192.168.1.17 routing-table=main scope=30 \
+    target-scope=10
+add comment="R1 &gt; Kesehatan" disabled=yes dst-address=192.168.13.128/27 \
+    gateway=192.168.1.2 routing-table=main
+add comment="R1 &gt; Kesehatan (backup)" disabled=yes distance=2 dst-address=\
+    192.168.13.128/27 gateway=192.168.1.17 routing-table=main scope=30 \
+    target-scope=10
+add comment="R1 &gt; OB " disabled=yes distance=2 dst-address=192.168.13.160/27 \
+    gateway=192.168.1.2 routing-table=main scope=30 target-scope=10
+add comment="R1 &gt; OB (backup)" disabled=yes distance=1 dst-address=\
+    192.168.13.160/27 gateway=192.168.1.17 routing-table=main scope=30 \
+    target-scope=10
+add comment="R1 &gt; Pemeliharaan" disabled=yes distance=1 dst-address=\
+    192.168.13.192/27 gateway=192.168.1.17 routing-table=main
+add comment="R1 &gt; Pemeliharaan (backup)" disabled=yes distance=2 dst-address=\
+    192.168.13.192/27 gateway=192.168.1.2 routing-table=main
+<span class="text-blue-400 font-semibold">/routing ospf interface-template</span>
+add area="area 0" disabled=no networks=\
+    192.168.10.0/24,192.168.1.0/30,192.168.20.0/24,192.168.1.16/30
+<span class="text-blue-400 font-semibold">/system identity</span>
+set name=R1
+<span class="text-blue-400 font-semibold">/tool romon</span>
+set enabled=yes
+
+<span class="text-emerald-400"># =========================================================</span>
+<span class="text-emerald-400"># 2. KONFIGURASI ROUTER 2 (R2 - LAB)</span>
+<span class="text-emerald-400"># =========================================================</span>
+<span class="text-blue-400 font-semibold">/interface ethernet</span>
+set [ find default-name=ether6 ] disable-running-check=no name=ether1
+set [ find default-name=ether1 ] disable-running-check=no name=ether2
+set [ find default-name=ether2 ] disable-running-check=no name=ether3
+set [ find default-name=ether3 ] disable-running-check=no name=ether4
+set [ find default-name=ether4 ] disable-running-check=no name=ether5
+set [ find default-name=ether5 ] disable-running-check=no name=ether6
+set [ find default-name=ether7 ] disable-running-check=no
+set [ find default-name=ether8 ] disable-running-check=no
+set [ find default-name=ether9 ] disable-running-check=no
+set [ find default-name=ether10 ] disable-running-check=no
+<span class="text-blue-400 font-semibold">/interface vlan</span>
+add interface=ether1 name="Jalur LAB 1" vlan-id=6
+add interface=ether1 name="Jalur LAB 2" vlan-id=7
+add interface=ether1 name="Jalur LAB 3" vlan-id=8
+add interface=ether1 name="Jalur LAB 4" vlan-id=9
+<span class="text-blue-400 font-semibold">/ip pool</span>
+add name=dhcp_pool0 ranges=192.168.11.2-192.168.11.126
+add name=dhcp_pool1 ranges=192.168.11.130-192.168.11.254
+add name=dhcp_pool2 ranges=192.168.12.2-192.168.12.126
+add name=dhcp_pool3 ranges=192.168.12.130-192.168.12.254
+<span class="text-blue-400 font-semibold">/ip dhcp-server</span>
+add address-pool=dhcp_pool0 interface="Jalur LAB 1" name=dhcp1
+add address-pool=dhcp_pool1 interface="Jalur LAB 2" name=dhcp2
+add address-pool=dhcp_pool2 interface="Jalur LAB 3" name=dhcp3
+add address-pool=dhcp_pool3 interface="Jalur LAB 4" name=dhcp4
+<span class="text-blue-400 font-semibold">/routing ospf instance</span>
+add disabled=no name="OSPF R2" router-id=2.2.2.2
+<span class="text-blue-400 font-semibold">/routing ospf area</span>
+add disabled=no instance="OSPF R2" name="area 0"
+<span class="text-blue-400 font-semibold">/ip address</span>
+add address=192.168.1.2/30 comment="gateway R1" interface=ether10 network=192.168.1.0
+add address=192.168.11.1/25 comment="LAB 1" interface="Jalur LAB 1" network=192.168.11.0
+add address=192.168.11.129/25 comment="LAB 2" interface="Jalur LAB 2" network=192.168.11.128
+add address=192.168.12.1/25 comment="LAB 3" interface="Jalur LAB 3" network=192.168.12.0
+add address=192.168.12.129/25 comment="LAB 4" interface="Jalur LAB 4" network=192.168.12.128
+add address=192.168.1.5/30 comment="Gateway R3" interface=ether2 network=192.168.1.4
+<span class="text-blue-400 font-semibold">/ip dhcp-client</span>
+add interface=ether1
+<span class="text-blue-400 font-semibold">/ip dhcp-server network</span>
+add address=192.168.11.0/25 dns-server=8.8.8.8 gateway=192.168.11.1
+add address=192.168.11.128/25 dns-server=8.8.8.8 gateway=192.168.11.129
+add address=192.168.12.0/25 dns-server=8.8.8.8 gateway=192.168.12.1
+add address=192.168.12.128/25 dns-server=8.8.8.8 gateway=192.168.12.129
+<span class="text-blue-400 font-semibold">/ip dns</span>
+set servers=8.8.8.8
+<span class="text-blue-400 font-semibold">/ip route</span>
+add comment="R2 &gt; IT&amp;Marketing (backup)" disabled=yes distance=2 dst-address=192.168.10.0/24 gateway=192.168.1.6 \
+    routing-table=main
+add comment="R2 &gt; IT&amp;Marketing" disabled=yes distance=1 dst-address=192.168.10.0/24 gateway=192.168.1.1 routing-table=\
+    main
+add comment="R2 &gt; Sosmed&amp;HRD" disabled=yes distance=1 dst-address=192.168.20.0/24 gateway=192.168.1.1 routing-table=\
+    main
+add comment="R2 &gt; Sosmed&amp;HRD (backup)" disabled=yes distance=2 dst-address=192.168.20.0/24 gateway=192.168.1.6 \
+    routing-table=main scope=30 target-scope=10
+add comment="R2 &gt;</pre>
+            </div>
+        </section>
+
+        <footer
+            class="py-10 text-center text-gray-500 text-sm flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-800/50 mt-8">
+            <p>© 2026 Designed & Engineered by <span class="text-gray-300 font-medium">Yurico</span>.</p>
+            <a href="landingpage.html"
+                class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors flex items-center gap-1 group">
+                Kembali ke Portofolio
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                    </path>
+                </svg>
+            </a>
+        </footer>
+
+    </main>
+
+    <script>
+        function copyConfigScript(btnElement) {
+            const codeText = document.getElementById('configCode').innerText;
+
+            // Clipboard API implementation with fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+
+                // Visual Feedback
+                const originalHTML = btnElement.innerHTML;
+                btnElement.classList.replace('bg-emerald-500/10', 'bg-emerald-500');
+                btnElement.classList.replace('text-emerald-400', 'text-black');
+                btnElement.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Tersalin!</span>
+                `;
+
+                setTimeout(() => {
+                    btnElement.classList.replace('bg-emerald-500', 'bg-emerald-500/10');
+                    btnElement.classList.replace('text-black', 'text-emerald-400');
+                    btnElement.innerHTML = originalHTML;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+    </script>
+</body>
+
+</html>
