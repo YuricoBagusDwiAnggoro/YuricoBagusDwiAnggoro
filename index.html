@@ -29,6 +29,12 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .text-gradient-security {
+            background: linear-gradient(to right, #f87171, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         /* Bento Box Styling Premium */
         .bento-card {
             background: linear-gradient(145deg, rgba(20, 20, 20, 0.9) 0%, rgba(10, 10, 10, 0.9) 100%);
@@ -43,6 +49,11 @@
             transform: translateY(-4px);
             border-color: rgba(52, 211, 153, 0.3);
             box-shadow: 0 10px 40px -10px rgba(52, 211, 153, 0.1);
+        }
+
+        .bento-card-security:hover {
+            border-color: rgba(248, 113, 113, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(248, 113, 113, 0.1);
         }
 
         /* Icon Wrapper (Lingkaran) */
@@ -80,6 +91,12 @@
             color: #34d399;
         }
 
+        .skill-tag-sec:hover {
+            background: rgba(248, 113, 113, 0.1);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+
         /* ========================================================= */
         /* EFEK ANIMASI ULAR (SNAKE BORDER) HIJAU NEON              */
         /* ========================================================= */
@@ -92,7 +109,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Lapisan Putaran Ular (Conic Gradient) */
         .snake-border-active::before {
             content: '';
             position: absolute;
@@ -105,27 +121,16 @@
                     transparent 270deg,
                     rgba(52, 211, 153, 0.2) 310deg,
                     #34d399 360deg);
-            /* 
-               =============================================================
-               [NOTE 1: KECEPATAN ULAR / SPEED]
-               Ubah angka '1.2s' di bawah ini untuk mengatur kecepatan ular:
-               - Angka LEBIH KECIL (misal: 0.8s, 1s) = Ular bergerak LEBIH CEPAT
-               - Angka LEBIH BESAR (misal: 2s, 3s)   = Ular bergerak LEBIH LAMBAT
-               =============================================================
-            */
             animation: rotateSnake 2.1s linear infinite;
         }
 
-        /* Lapisan Latar Belakang Dalam Bento (agar tengahnya tetap gelap) */
         .snake-border-active::after {
             content: '';
             position: absolute;
             z-index: -1;
             inset: 2px;
-            /* Ketebalan garis ular (2px) */
             background: linear-gradient(145deg, rgba(20, 20, 20, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
             border-radius: 26px;
-            /* Menyesuaikan border radius bento (28px - 2px) */
         }
 
         @keyframes rotateSnake {
@@ -159,17 +164,15 @@
 
             <!-- Box 1: Profile & Bio (Spans 2 cols) -->
             <div class="bento-card col-span-1 md:col-span-2 flex flex-col justify-between relative overflow-hidden">
-                <!-- Efek cahaya hijau di pojok kanan atas -->
                 <div
                     class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none">
                 </div>
 
                 <div class="relative z-10">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
-                        <!-- Foto Profil -->
                         <div
                             class="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-2 border-emerald-500/30 p-1.5 overflow-hidden relative group shrink-0">
-                            <img src="gambar/Profile.jpeg"
+                            <img src="C:\Users\Yurico\Documents\Web Porto\gambar\Profile.jpeg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/1e1e1e/34d399?text=Foto+Profil';"
                                 alt="Profile Photo"
                                 class="w-full h-full object-cover rounded-[18px] group-hover:scale-110 transition-transform duration-500">
@@ -185,7 +188,12 @@
                         </div>
                     </div>
                     <p class="text-gray-400 text-base md:text-lg w-full leading-relaxed text-justify">
-A Computer Science graduate with 1 year of experience in Technical Support, experienced in maintaining IT infrastructure operations and providing efficient technical solutions to users. Possesses practical expertise in advanced network simulation and configuration (OSPF, VLAN, Routing) using MikroTik and GNS3. Focused on designing robust network infrastructure and ensuring its security, and ready to contribute fully as a Network Engineer.
+                        A Computer Science graduate with 1 year of experience in Technical Support, experienced in
+                        maintaining IT infrastructure operations and providing efficient technical solutions to users.
+                        Possesses practical expertise in advanced network simulation and configuration (OSPF, VLAN,
+                        Routing, Enterprise Security) using MikroTik, OPNsense, and GNS3. Focused on designing robust
+                        network infrastructure and
+                        ensuring its security.
                     </p>
                 </div>
             </div>
@@ -193,8 +201,6 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
             <!-- Box 2: Connect / Contact -->
             <div id="connect-box" class="bento-card col-span-1 flex flex-col justify-center space-y-6 relative">
                 <h3 class="text-lg font-bold text-white mb-2">Let's Connect</h3>
-
-                <!-- Gmail -->
                 <a href="mailto:yuricoanggoro6@gmail.com"
                     class="social-link flex items-center gap-4 group cursor-pointer">
                     <div class="icon-box">
@@ -211,8 +217,6 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                         <p class="text-xs text-gray-500">yuricoanggoro6@gmail.com</p>
                     </div>
                 </a>
-
-                <!-- LinkedIn -->
                 <a href="https://www.linkedin.com/in/yurico-bagus-dwi-anggoro-b9b070236/" target="_blank"
                     class="social-link flex items-center gap-4 group cursor-pointer">
                     <div class="icon-box">
@@ -228,8 +232,6 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                         <p class="text-xs text-gray-500">Yurico Bagus Dwi Anggoro</p>
                     </div>
                 </a>
-
-                <!-- Location -->
                 <div class="flex items-center gap-4 mt-2">
                     <div class="icon-box bg-transparent border-none w-8 h-8">
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,11 +249,9 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
             <!-- Box 3: Certification -->
             <div class="bento-card col-span-1 flex flex-col justify-between group hover:border-blue-500/30">
                 <div>
-                    <!-- Logo / Badge MTCNA -->
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-blue-900 to-gray-900 border border-blue-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform overflow-hidden">
-                        <!-- Ganti nama file sesuai dengan logo yang Anda simpan. Ditambahkan fallback image untuk preview web -->
-                        <img src="gambar/logoMikrotik.jpg"
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\logoMikrotik.jpg"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x400/1e3a8a/60a5fa?text=MikroTik';"
                             alt="MikroTik Logo" class="w-10 h-10 object-contain drop-shadow-md">
                     </div>
@@ -259,7 +259,6 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                     <p class="text-sm text-gray-400 mb-6">MikroTik Certified Network Associate. Membuktikan kompetensi
                         dalam manajemen RouterOS dasar hingga menengah.</p>
                 </div>
-                <!-- Button See Credential -->
                 <a href="https://mikrotik.com/training/certificates/c727125c012af1172b25" target="_blank"
                     class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white/5 hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/30 rounded-xl text-sm font-medium transition-all group-hover:text-blue-400 text-gray-300">
                     See Credential
@@ -270,7 +269,7 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                 </a>
             </div>
 
-            <!-- Box 4: Technical Skills (Spans 2 cols) -->
+            <!-- Box 4: Technical Skills -->
             <div class="bento-card col-span-1 md:col-span-2">
                 <div class="flex flex-col h-full justify-center">
                     <div class="mb-4">
@@ -280,35 +279,41 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                     </div>
                     <div class="flex flex-wrap gap-2.5">
                         <span class="skill-tag border-emerald-500/30 text-emerald-400">MikroTik RouterOS</span>
-                        <span class="skill-tag">GNS3 Simulator</span>
-                        <span class="skill-tag">Static Routing & Failover</span>
+                        <span class="skill-tag border-red-500/30 text-red-400">OPNsense Firewall</span>
+                        <span class="skill-tag">IPsec VPN (IKEv2)</span>
                         <span class="skill-tag border-red-500/30 text-red-400">OSPF</span>
-                        <span class="skill-tag border-blue-500/30 text-blue-400">Bridge VLAN Filtering</span>
-                        <span class="skill-tag">DHCP & DNS Server</span>
-                        <span class="skill-tag">NAT</span>
+                        <span class="skill-tag border-blue-500/30 text-blue-400">VLAN & Switching</span>
+                        <span class="skill-tag">GNS3 Simulator</span>
+                        <span class="skill-tag">DHCP & DNS Sinkholing</span>
                         <span class="skill-tag border-purple-500/30 text-purple-400">QoS</span>
-                        <span class="skill-tag">Route Summarization</span>
+                        <span class="skill-tag">NAT / Port Forwarding</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Spacer -->
-        <div class="py-8 flex items-center justify-center">
+        <!-- Spacer Project 1 -->
+        <div class="py-8 flex items-center justify-center mt-4">
             <div class="h-px w-24 bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
-            <span class="mx-4 text-xs text-gray-600 uppercase tracking-widest font-semibold">Featured Work</span>
+            <span class="mx-4 text-xs text-gray-600 uppercase tracking-widest font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                    </path>
+                </svg>
+                Infrastructure & Routing
+            </span>
             <div class="h-px w-24 bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
         </div>
 
         <!-- ========================================== -->
-        <!-- SECTION 2: GNS3 PROJECT SHOWCASE           -->
+        <!-- SECTION 2: PROJECT 1 (RING TOPOLOGY)       -->
         <!-- ========================================== -->
         <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
             <!-- Featured GNS3 Project (Full Width Landscape) -->
             <div
                 class="bento-card col-span-1 md:col-span-3 lg:col-span-4 relative overflow-hidden group flex flex-col lg:flex-row gap-8 items-center">
-                <!-- Text & Button (Kiri) -->
                 <div class="relative z-10 flex flex-col w-full lg:w-1/3">
                     <span
                         class="inline-block px-3 py-1 bg-white/10 text-white text-xs font-semibold rounded-full mb-4 w-max">Enterprise
@@ -318,8 +323,6 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                         Simulasi infrastruktur jaringan skala Enterprise 5 Router (R1-R5) di GNS3. Terintegrasi dengan
                         10 segmen VLAN, 14 PC client, NAT1/Cloud1, serta failover redundancy inter-router /30.
                     </p>
-
-                    <!-- Tombol Show More / Next Page -->
                     <a href="PoC1.html"
                         class="inline-flex items-center justify-center gap-2 py-3 px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] w-max">
                         View Proof Of Concept
@@ -330,17 +333,16 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                     </a>
                 </div>
 
-                <!-- Gambar Topologi Landscape (Kanan) -->
                 <div
                     class="w-full lg:w-2/3 bg-[#0a0a0a] rounded-xl border border-gray-800 relative overflow-hidden group-hover:border-emerald-500/50 transition duration-500 aspect-video flex items-center justify-center">
-                    <img src="gambar/TOPOLOGI.png"
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\TOPOLOGI.png"
                         onerror="this.onerror=null; this.src='https://placehold.co/800x450/111827/34d399?text=GNS3+5-Router+Ring+Topology';"
                         alt="GNS3 Ring Topology"
                         class="w-full h-full object-contain p-2 opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700">
                 </div>
             </div>
 
-            <!-- Sub-Box 1: Terminal Snippet (Spans 2 col) -->
+            <!-- Sub-Box 1: Terminal Snippet -->
             <div
                 class="bento-card col-span-1 lg:col-span-2 flex flex-col bg-[#080808] border-gray-800 relative overflow-hidden group">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-800 to-gray-600"></div>
@@ -353,155 +355,197 @@ A Computer Science graduate with 1 year of experience in Technical Support, expe
                     <span class="text-[10px] text-gray-600 font-mono">5-Router Ring Failover Proof</span>
                 </div>
                 <div class="font-mono text-[11px] md:text-xs text-gray-400 opacity-90 flex-grow overflow-x-auto">
-                    <p class="text-gray-300">[admin@R1] > <span class="text-emerald-400">/ip route print detail where
-                            dst-address=192.168.13.0/25</span></p>
-                    <p class="text-white mt-1">0 A S dst-address=192.168.13.0/25 gateway=192.168.1.2 distance=1</p>
-                    <p class="text-gray-500 ml-8 mb-2">comment="R1 > R2 > R3 (Jalur Timur - Utama)" scope=30
-                        target-scope=10</p>
-
-                    <p class="text-white">1 S dst-address=192.168.13.0/25 gateway=192.168.1.17 distance=2</p>
-                    <p class="text-gray-500 ml-8 mb-2">comment="R1 > R5 > R4 > R3 (Jalur Selatan - Failover)" scope=30
-                        target-scope=10</p>
-
-                    <p class="text-gray-300">[admin@R2] > <span class="text-emerald-400">/ip route print detail where
-                            dst-address=0.0.0.0/0</span></p>
-                    <p class="text-white mt-1">0 A S dst-address=0.0.0.0/0 gateway=192.168.1.1 distance=1</p>
-                    <p class="text-gray-500 ml-8">comment="R2 > R1 (Internet Utama via NAT1)" scope=30 target-scope=10
+                    <p class="text-gray-300">[admin@R1] > <span class="text-emerald-400">/ip route print detail</span>
                     </p>
+                    <p class="text-white mt-1">0 A S dst-address=192.168.13.0/25 gateway=192.168.1.2 distance=1</p>
+                    <p class="text-gray-500 ml-8 mb-2">comment="Jalur Timur - Utama"</p>
+                    <p class="text-white">1 S dst-address=192.168.13.0/25 gateway=192.168.1.17 distance=2</p>
+                    <p class="text-gray-500 ml-8 mb-2">comment="Jalur Selatan - Failover"</p>
                 </div>
             </div>
 
-            <!-- Sub-Box 2: Core Services (Spans 1 col) -->
-            <div class="bento-card col-span-1 flex flex-col justify-center group hover:border-gray-500/30">
-                <div
-                    class="w-10 h-10 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
-                        </path>
-                    </svg>
+            <!-- Sub-Box 2 & 3: Services & QoS (Merged logic for space) -->
+            <div
+                class="bento-card col-span-1 lg:col-span-2 flex flex-col justify-center group hover:border-blue-500/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold">Bandwidth Management (QoS)</h3>
                 </div>
-                <h3 class="text-lg font-bold mb-2">Core Services</h3>
-                <p class="text-xs text-gray-400 mb-4">Infrastruktur esensial yang di-deploy di seluruh jaringan:</p>
+                <p class="text-xs text-gray-400 leading-relaxed mb-4">
+                    Prioritas tinggi untuk <strong>Zoom Meeting</strong> menggunakan <i>Queue Tree</i> & <i>Packet
+                        Mark</i>. Mencegah latency akibat beban unduhan dari segmen VLAN lain.
+                </p>
                 <div class="flex flex-wrap gap-2">
                     <span
                         class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">Bridge
                         VLAN</span>
                     <span
-                        class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">NAT</span>
-                    <span
                         class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">DHCP
-                        Server</span>
+                        & NAT</span>
                     <span
-                        class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">DNS</span>
-                    <span
-                        class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">OSPF</span>
+                        class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-emerald-700/50 rounded-md text-emerald-400 bg-emerald-900/20">OSPF</span>
                 </div>
             </div>
+        </section>
 
-            <!-- Sub-Box 3: QoS Highlight (Spans 1 col) -->
-            <div class="bento-card col-span-1 flex flex-col justify-center group hover:border-blue-500/30">
-                <div
-                    class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-bold mb-2">Bandwidth Management (QoS)</h3>
-                <p class="text-xs text-gray-400 leading-relaxed">
-                    Prioritas tinggi untuk <strong>Zoom Meeting</strong> menggunakan <i>Queue Tree</i> & <i>Packet
-                        Mark</i>. Mencegah latency akibat beban unduhan biasa.
-                </p>
-            </div>
+        <!-- Spacer Project 2 -->
+        <div class="py-12 flex items-center justify-center mt-4">
+            <div class="h-px w-24 bg-gradient-to-r from-transparent via-red-900 to-transparent"></div>
+            <span class="mx-4 text-xs text-red-500/80 uppercase tracking-widest font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                    </path>
+                </svg>
+                Cybersecurity & Edge
+            </span>
+            <div class="h-px w-24 bg-gradient-to-r from-transparent via-red-900 to-transparent"></div>
+        </div>
 
-            <!-- Sub-Box 4: Inter-VLAN Routing Terminal Proof (Spans 2 cols) -->
+        <!-- ========================================== -->
+        <!-- SECTION 3: PROJECT 2 (SECURITY & VPN)      -->
+        <!-- ========================================== -->
+        <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+            <!-- Featured Project 2 (Full Width Landscape) -->
             <div
-                class="bento-card col-span-1 lg:col-span-2 flex flex-col bg-[#080808] border-gray-800 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
+                class="bento-card bento-card-security col-span-1 md:col-span-3 lg:col-span-4 relative overflow-hidden group flex flex-col lg:flex-row gap-8 items-center">
+                <!-- Glow Effect Red -->
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none">
+                </div>
+
+                <!-- Text & Button (Kiri) -->
+                <div class="relative z-10 flex flex-col w-full lg:w-1/3">
+                    <span
+                        class="inline-block px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-full mb-4 w-max">Security
+                        Architecture</span>
+                    <h3 class="text-2xl font-bold mb-3">Enterprise Edge Security & IPsec VPN</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Simulasi keamanan perimeter tingkat *enterprise*. Merancang OPNsense & MikroTik untuk
+                        mengamankan Web Server di zona DMZ, membangun enkripsi Site-to-Site VPN antar kantor, serta
+                        menegakkan anti-bypass DNS Sinkholing.
+                    </p>
+
+                    <!-- Tombol View PoC (Nantinya mengarah ke file PoC2.html) -->
+                    <a href="PoC2.html"
+                        class="inline-flex items-center justify-center gap-2 py-3 px-6 bg-red-500 hover:bg-red-400 text-black font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(248,113,113,0.4)] w-max">
+                        View Proof Of Concept
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Gambar Topologi Project 2 (Kanan) -->
+                <div
+                    class="w-full lg:w-2/3 bg-[#0a0a0a] rounded-xl border border-gray-800 relative overflow-hidden group-hover:border-red-500/40 transition duration-500 aspect-video flex items-center justify-center">
+                    <!-- Gunakan nama file topologi keamananmu di src ini nanti -->
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\Topologi\topolohiPOC2.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/800x450/111827/f87171?text=OPNsense+Security+Topology';"
+                        alt="Security Topology"
+                        class="w-full h-full object-contain p-2 opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700">
+                </div>
+            </div>
+
+            <!-- Sub-Box 1: DNS Sinkhole Terminal (Spans 2 col) -->
+            <div
+                class="bento-card bento-card-security col-span-1 lg:col-span-2 flex flex-col bg-[#080808] border-gray-800 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-800 to-red-500"></div>
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex gap-2">
                         <div class="w-3 h-3 rounded-full bg-red-500"></div>
                         <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                         <div class="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
-                    <span class="text-[10px] text-gray-600 font-mono">Inter-VLAN Proof (PC2 > PC1)</span>
+                    <span class="text-[10px] text-gray-500 font-mono">DNS Leak Prevention (Port 53)</span>
                 </div>
                 <div
                     class="font-mono text-[11px] md:text-xs text-gray-400 opacity-90 flex-grow overflow-x-auto space-y-1">
-                    <p class="text-gray-300">PC2> <span class="text-emerald-400">ping 192.168.10.126</span></p>
-                    <p class="text-white mt-2">84 bytes from 192.168.10.126 icmp_seq=1 ttl=63 time=50.650 ms</p>
-                    <p class="text-white">84 bytes from 192.168.10.126 icmp_seq=2 ttl=63 time=26.562 ms</p>
-                    <p class="text-white">84 bytes from 192.168.10.126 icmp_seq=3 ttl=63 time=33.786 ms</p>
-                    <p class="text-white">84 bytes from 192.168.10.126 icmp_seq=4 ttl=63 time=16.444 ms</p>
-                    <p class="text-white">84 bytes from 192.168.10.126 icmp_seq=5 ttl=63 time=16.214 ms</p>
+                    <p class="text-gray-500"># Uji pemblokiran sosmed dengan DNS Lokal</p>
+                    <p class="text-gray-300">PC2> <span class="text-red-400">ping instagram.com</span></p>
+                    <p class="text-white mt-1">instagram.com resolved to 0.0.0.0</p>
+                    <p class="text-white mb-3">instagram.com icmp_seq=1 timeout</p>
+
+                    <p class="text-gray-500 mt-2"># User mencoba bypass dengan DNS Google</p>
+                    <p class="text-gray-300">PC2> <span class="text-red-400">ip dns 8.8.8.8</span></p>
+                    <p class="text-gray-300">PC2> <span class="text-red-400">ping google.com</span></p>
+                    <p class="text-white mt-1 border-l-2 border-red-500 pl-2 bg-red-500/10">Cannot resolve google.com
+                    </p>
                 </div>
             </div>
 
-            <!-- Sub-Box 5: Inter-VLAN Explanation (Spans 2 cols) -->
-            <div
-                class="bento-card col-span-1 lg:col-span-2 flex flex-col justify-center group hover:border-emerald-500/30">
+            <!-- Sub-Box 2: Security Stack (Spans 1 col) -->
+            <div class="bento-card bento-card-security col-span-1 flex flex-col justify-center group">
                 <div
-                    class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-10 h-10 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold mb-2">Inter-VLAN Routing Validated</h3>
-                <p class="text-sm text-gray-400 leading-relaxed mb-3">
-                    Komunikasi sukses antara dua segmen *broadcast* yang berbeda: <strong>Subnet-1
-                        (192.168.10.126/25)</strong> dan <strong>Subnet-2 (192.168.10.254/25)</strong>.
-                </p>
-                <div class="bg-gray-800/40 p-3 rounded-lg border border-gray-700/50">
-                    <p class="text-xs text-gray-400 leading-relaxed">
-                        <span class="text-emerald-400 font-semibold">Technical Insight:</span> Nilai <code
-                            class="font-mono bg-black px-1.5 py-0.5 rounded text-gray-300">ttl=63</code> pada hasil
-                        <i>ping</i> membuktikan bahwa paket data telah berhasil di-routing melewati satu
-                        <i>hop</i> (Router Gateway di Layer 3), bukan sekadar <i>switching</i> biasa di Layer 2.
-                    </p>
+                <h3 class="text-lg font-bold mb-2">Security Arsenal</h3>
+                <p class="text-xs text-gray-400 mb-4">Menerapkan <i>Best Practice</i> standar industri:</p>
+                <div class="flex flex-wrap gap-2">
+                    <span
+                        class="px-2 py-1 text-[10px] font-bold border border-red-500/30 rounded-md text-red-400 bg-red-500/10">OPNsense</span>
+                    <span
+                        class="px-2 py-1 text-[10px] font-bold border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">IPsec
+                        IKEv2</span>
+                    <span
+                        class="px-2 py-1 text-[10px] font-bold border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">Unbound
+                        DNS</span>
+                    <span
+                        class="px-2 py-1 text-[10px] font-bold border border-gray-700 rounded-md text-gray-300 bg-gray-800/50">DMZ
+                        & NAT</span>
                 </div>
+            </div>
+
+            <!-- Sub-Box 3: IPsec Insight (Spans 1 col) -->
+            <div class="bento-card bento-card-security col-span-1 flex flex-col justify-center group">
+                <div
+                    class="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Encrypted Tunnel</h3>
+                <p class="text-xs text-gray-400 leading-relaxed mb-3">
+                    Komunikasi data antar cabang dibungkus protokol ESP (IPsec). Traceroute menghasilkan status <code
+                        class="font-mono bg-black text-orange-400 px-1 rounded">* * *</code> membuktikan enkripsi
+                    berhasil menyembunyikan IP dari publik ISP.
+                </p>
             </div>
 
         </section>
 
         <!-- Footer -->
-        <footer class="mt-16 text-center text-gray-600 text-sm pb-8">
+        <footer class="mt-16 text-center text-gray-600 text-sm pb-8 border-t border-gray-800/50 pt-8">
             <p>© 2026 Designed & Engineered by Yurico.</p>
         </footer>
 
     </main>
 
-    <!-- Script untuk Animasi Ular Neon "Hire Me" -->
+    <!-- Script Animasi Let's Connect -->
     <script>
         function highlightConnectBox(event) {
-            event.preventDefault(); // Mencegah reload/lompat mendadak
-
+            event.preventDefault();
             const connectBox = document.getElementById('connect-box');
-
-            // Scroll layar secara halus menuju kotak Let's Connect
             connectBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Tambahkan kelas animasi ular neon hijau
             connectBox.classList.add('snake-border-active');
-
-            /* 
-               =============================================================
-               [NOTE 2: DURASI KAPAN MENGHILANG / DURATION]
-               Ubah angka '4000' di bawah ini untuk mengatur berapa lama 
-               animasi ular berjalan sebelum hilang otomatis.
-               Format dalam milidetik (ms):
-               - 3000 = 3 Detik
-               - 4000 = 4 Detik (Default)
-               - 5000 = 5 Detik
-               =============================================================
-            */
-            const DURATION_MS = 4000;
-
-            // Hapus efek ular setelah durasi waktu habis
             setTimeout(() => {
                 connectBox.classList.remove('snake-border-active');
-            }, DURATION_MS);
+            }, 4000);
         }
     </script>
 </body>
