@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of Concept - Security Architecture | Yurico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030303;
+            color: #ededed;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(244, 63, 94, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.03) 0%, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px;
+            background-attachment: fixed;
+        }
+
+        .font-mono {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .text-gradient-security {
+            background: linear-gradient(135deg, #f43f5e 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bento-card {
+            background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(14, 14, 17, 0.9) 100%);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        .bento-card:hover {
+            border-color: rgba(244, 63, 94, 0.2);
+            box-shadow: 0 10px 40px -10px rgba(244, 63, 94, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        .img-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .img-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #f43f5e;
+            font-weight: bold;
+            font-family: 'Fira Code', monospace;
+            flex-shrink: 0;
+        }
+
+        /* Divider Line Stylings */
+        .pillar-divider {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4rem 0;
+        }
+
+        .pillar-divider::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .pillar-divider-text {
+            background-color: #030303;
+            padding: 0 1rem;
+            color: #6b7280;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 lg:p-12 selection:bg-rose-500/30 selection:text-rose-200">
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+        <a href="landingPage.html"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-sm font-medium text-gray-300 hover:text-white transition-all backdrop-blur-sm group">
+            <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+            Kembali ke Portofolio
+        </a>
+        <div class="text-xs font-mono text-gray-500 hidden sm:flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-500/50"></span>
+            YRC
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto space-y-10">
+
+        <!-- HEADER -->
+        <header class="bento-card relative overflow-hidden">
+            <div
+                class="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none">
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full blur-[80px] -ml-20 -mb-20 pointer-events-none">
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+                <div>
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <span class="badge bg-rose-500/10 border border-rose-500/20 text-rose-400">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse mr-2"></span>
+                            OPNsense Firewall
+                        </span>
+                        <span class="badge bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                            MikroTik RouterOS
+                        </span>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
+                        Proof of Concept: <br class="hidden md:block" />
+                        <span class="text-gradient-security">Enterprise Network Security</span>
+                    </h1>
+                    <p class="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed">
+                        Implementasi arsitektur keamanan meliputi isolasi DMZ, enkripsi Site-to-Site
+                        IPsec VPN, dan Strict DNS Enforcement.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- THE TASK & RATIONALE -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-gray-300 font-mono shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Task & Design</h2>
+                    <p class="text-sm text-gray-400 mt-1">Latar belakang permasalahan dan justifikasi pemilihan
+                        arsitektur.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bento-card space-y-4">
+                    <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        Business Challenges
+                    </h3>
+                    <ul class="text-gray-400 text-sm space-y-3 leading-relaxed">
+                        <li class="flex gap-3">
+                            <span class="text-rose-500 font-bold mt-0.5">•</span>
+                            <span><strong>Server Exposure:</strong> Sebuah Web Server internal
+                                perlu bisa diakses publik, sementara data di jaringan LAN utama tetap
+                                terlindungi.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-rose-500 font-bold mt-0.5">•</span>
+                            <span><strong>Unsecured Branch:</strong> Kantor cabang memerlukan akses ke server
+                                pusat melalui
+                                ISP, tapi solusi seperti leased line terlalu mahal.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-rose-500 font-bold mt-0.5">•</span>
+                            <span><strong>Social Media Bypass:</strong> Pemblokiran
+                                media sosial berbasis IP sering gagal dan pengguna tetap bisa mengaksesnya.</span>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="bento-card space-y-4">
+                    <h3 class="text-lg font-bold text-orange-400 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                            </path>
+                        </svg>
+                        Tech Stack: Mengapa OPNsense?
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                        Pemilihan <strong>OPNsense</strong> didasarkan pada efisiensi biaya (*cost-effective*) dan
+                        fleksibilitas infrastruktur. Sebagai solusi *open-source* berbasis FreeBSD, OPNsense menyediakan
+                        kapabilitas *enterprise-grade* seperti IPsec IKEv2 dan fitur Advanced NAT tanpa biaya lisensi
+                        mahal
+                        seperti pada Fortinet atau Palo Alto. Sangat optimal untuk
+                        virtualisasi.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FULL TOPOLOGY OVERVIEW -->
+        <section class="space-y-6 mt-12">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-gray-300 font-mono shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Network Topology Overview</h2>
+                    <p class="text-sm text-gray-400 mt-1">Desain arsitektur lab GNS3 secara keseluruhan.</p>
+                </div>
+            </div>
+
+            <div class="bento-card space-y-4">
+                <p class="text-gray-400 text-sm leading-relaxed text-justify mb-6">
+                    Topologi ini dirancang untuk mensimulasikan lingkungan jaringan <i>Enterprise</i> yang
+                    . Jaringan dibagi menjadi dua lokasi utama yang dihubungkan melalui simulasi Internet
+                    (ISP): <strong>Kantor Pusat (HQ)</strong> yang diamankan oleh OPNsense Firewall, dan <strong>Kantor
+                        Cabang (Branch)</strong> yang menggunakan MikroTik RouterOS. Desain ini bertujuan untuk
+                    mensimulasikan tiga keamanan: Isolasi layanan publik (DMZ), Komunikasi antar-cabang
+                    terenkripsi (IPsec VPN), dan Kontrol akses pengguna (DNS Sinkhole).
+                </p>
+                <div class="img-container bg-black/60 p-2 border border-gray-800 relative cursor-crosshair">
+                    <div
+                        class="absolute top-4 right-4 bg-gray-800/80 text-gray-300 text-[10px] px-2 py-1 rounded border border-gray-600 font-mono backdrop-blur-sm z-10">
+                        Full GNS3 Topology</div>
+                    <!-- SLOT GAMBAR TOPOLOGI FULL -->
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\Topologi\topolohiPOC2.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1200x600/09090b/4b5563?text=SLOT+FOTO+TOPOLOGI+FULL';"
+                        alt="Full Network Topology" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+        </section>
+
+        <div class="pillar-divider">
+            <span class="pillar-divider-text">SECURITY PLAN 01</span>
+        </div>
+
+        <!-- DEEP DIVE: PILLAR 1 - DMZ -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center font-bold text-rose-400 font-mono shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+                    P1</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">DMZ Isolation</h2>
+                    <p class="text-sm text-gray-400 mt-1">Langkah teknis dan pembuktian isolasi Web Server dari internet
+                        publik.</p>
+                </div>
+            </div>
+
+            <!-- Tahap 1: Konsep & Topologi -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number">01</div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-white">Arsitektur Segmentasi (DMZ Zone)</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed max-w-4xl text-justify">
+                            Untuk memitigasi risiko pembobolan, Web Server <code
+                                class="bg-gray-800 text-rose-300 px-1 rounded">192.168.2.6</code> diletakkan di
+                            interface fisik yang berbeda dari jaringan lokal karyawan. Aturan Default
+                            Deny yang ada di OPNsense mencegah jika ada penyusup berhasil membobol Web Server
+                            mereka tidak bisa melompat ke jaringan internal.
+                        </p>
+                    </div>
+                </div>
+                <!-- Gambar 1: Topologi DMZ -->
+                <div class="img-container bg-black/60 p-2 border border-gray-800 mt-4 max-w-4xl mx-auto">
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\DMZ1.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1000x400/09090b/f43f5e?text=SLOT+GAMBAR+1:+Topologi+Fokus+Area+DMZ+dan+OPNsense';"
+                        alt="Arsitektur Topologi DMZ" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+
+            <!-- Tahap 2: Konfigurasi Port Forwarding -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number">02</div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-white">Konfigurasi NAT Port Forwarding</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed max-w-4xl text-justify">
+                            Karena Web Server menggunakan IP Private, ia tidak bisa dihubungi langsung dari Internet.
+                            Saya membuat <strong>Rule Port Forwarding</strong> pada antarmuka WAN OPNsense. Rule ini
+                            bertugas
+                            mendengarkan trafik HTTP di IP Publik OPNsense <code
+                                class="bg-gray-800 text-rose-300 px-1 rounded">103.10.1.2:80</code>, lalu
+                            meneruskannya ke IP Private Web Server di zona DMZ <code
+                                class="bg-gray-800 text-rose-300 px-1 rounded">192.168.2.6:80</code>.
+                        </p>
+                    </div>
+                </div>
+                <!-- Gambar 2: Rule NAT OPNsense -->
+                <div class="img-container bg-black/60 p-2 border border-gray-800 mt-4 max-w-4xl mx-auto">
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\portForward.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1000x300/09090b/f97316?text=SLOT+GAMBAR+2:+Screenshot+Rule+NAT+Port+Forward+di+GUI+OPNsense';"
+                        alt="Aturan NAT Port Forwarding OPNsense" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+
+            <!-- Tahap 3: Validasi (Final Proof) -->
+            <div class="bento-card space-y-6 group">
+                <div class="flex gap-4">
+                    <div class="step-number bg-emerald-500/10 border-emerald-500/30 text-emerald-400">03</div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-emerald-400">Final Validation: Public Access (ISP)</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed max-w-4xl text-justify">
+                            Untuk membuktikan sistem berfungsi, saya melakukan simulasi akses dari luar / inernet
+                            menggunakan router ISP(anggap router ini adalah pihak luar yang ingin mengakses web
+                            Browser).
+                            Permintaan web
+                            brhasil ditembus dan halaman HTML dari dalam DMZ sukses diunduh dari jaringan publik.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Gambar 3: Grid 3 Bukti Fetch MikroTik -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 max-w-5xl mx-auto">
+
+                    <!-- Bukti 1: Terminal Fetch (Spans 2 columns) -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 md:col-span-2 relative group/img cursor-crosshair">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded border border-emerald-500/30 font-mono backdrop-blur-sm z-10">
+                            1. ISP Terminal Fetch</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\TerimnalFetch.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/1000x300/09090b/10b981?text=Terminal+Fetch';"
+                            alt="Bukti Fetch Terminal"
+                            class="w-full h-full object-cover rounded-lg group-hover/img:scale-[1.01] transition-transform duration-500">
+                    </div>
+
+                    <!-- Bukti 2: Winbox File -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-full flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-4 right-4 bg-blue-500/20 text-blue-400 text-[10px] px-2 py-1 rounded border border-blue-500/30 font-mono backdrop-blur-sm z-10">
+                            2. File Received</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\winboxFile.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/500x300/09090b/3b82f6?text=Winbox+Files';"
+                            alt="Winbox File List"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- Bukti 3: Browser Output -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-full flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-4 right-4 bg-rose-500/20 text-rose-400 text-[10px] px-2 py-1 rounded border border-rose-500/30 font-mono backdrop-blur-sm z-10">
+                            3. HTML Rendered</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\browserOutput.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/500x300/09090b/f43f5e?text=Browser+Output';"
+                            alt="Browser HTML Output"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Tahap 4: Anti-Pivoting Validation -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number bg-red-500/10 border-red-500/30 text-red-400">04</div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-red-400">Anti-Pivoting Test</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed max-w-4xl text-justify">
+                            Firewall OPNsense secara bawaan dikonfigurasi dengan <i>action</i> <strong>Drop</strong>.
+                            Saat ping
+                            dilaukukan,
+                            terminal stuck karena paket diam-diam dibuang tanpa memberi jawaban, hal ini membuat ping
+                            tidak berjalan sama sekali.
+                        </p>
+                    </div>
+                </div>
+                <!-- Gambar 4: Anti Pivoting -->
+                <div class="img-container bg-black/60 p-2 border border-gray-800 mt-4 max-w-4xl mx-auto">
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\poc_pivot.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1000x300/09090b/ef4444?text=SLOT+GAMBAR+4:+Terminal+Web+Server+Gagal+Ping+LAN';"
+                        alt="Bukti Gagal Ping dari DMZ ke LAN" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+        </section>
+
+        <div class="pillar-divider">
+            <span class="pillar-divider-text">SECURITY PLAN 02</span>
+        </div>
+
+        <!-- DEEP DIVE: PILLAR 2 - IPSEC VPN -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 font-mono shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                    P2</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">IPsec Site-to-Site VPN</h2>
+                    <p class="text-sm text-gray-400 mt-1">Enkripsi jalur komunikasi antar-kantor melintasi internet
+                        publik menggunakan standar IKEv2.</p>
+                </div>
+            </div>
+
+            <!-- Tahap 1: Konfigurasi & Kebijakan VPN -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number bg-blue-500/10 border-blue-500/30 text-blue-400">01</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-white">Cryptography & Policy Setup</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Fase pertama adalah mendefinisikan parameter koneksi IPsec antara OPNsense di
+                            HQ
+                            <code class="bg-gray-800 text-blue-300 px-1 rounded">103.10.1.2</code> dan MikroTik di
+                            Branch
+                            <code class="bg-gray-800 text-blue-300 px-1 rounded">180.20.1.2</code>. Tunnel
+                            dirancang
+                            untuk menjembatani subnet lokal HQ <code
+                                class="bg-gray-800 text-blue-300 px-1 rounded">192.168.4.0/24</code> menuju subnet
+                            Branch
+                            <code class="bg-gray-800 text-blue-300 px-1 rounded">192.168.5.0/24</code> dan sebaliknya.
+                        </p>
+                        <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-800 text-sm text-gray-300 mt-2">
+                            konfigruasi berhasil
+                            dengan menyelaraskan algoritma Phase 1 & Phase 2 secara pada kedua sisi (AES-128,
+                            SHA-1,
+                            dan PFS Group 2 / modp1024) serta <i>mirroring</i> aturan <i>routing</i> menggunakan
+                            otentikasi IKEv2 Pre-Shared Key (PSK).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Komparasi OPNsense vs MikroTik -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                    <!-- OPNsense Connections -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded border border-orange-500/30 font-mono backdrop-blur-sm z-10">
+                            HQ: OPNsense Policy</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\VPNconnect.png"
+                            alt="OPNsense IPsec Policy"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- MikroTik Policies (Gambar 1) -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-blue-500/20 text-blue-400 text-[10px] px-2 py-1 rounded border border-blue-500/30 font-mono backdrop-blur-sm z-10">
+                            Branch: MikroTik Policy</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\mikrotikpolicies.png"
+                            alt="MikroTik IPsec Policy"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- OPNsense PSK -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded border border-orange-500/30 font-mono backdrop-blur-sm z-10">
+                            HQ: OPNsense PSK</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\preshared.png" alt="OPNsense PSK"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- MikroTik Proposals (Gambar 2) -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-blue-500/20 text-blue-400 text-[10px] px-2 py-1 rounded border border-blue-500/30 font-mono backdrop-blur-sm z-10">
+                            Branch: Crypto Proposal</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\mikroproposal.png"
+                            alt="MikroTik Crypto Proposal"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tahap 2: Tunnel Establishment -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number bg-blue-500/10 border-blue-500/30 text-blue-400">02</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-white">Tunnel Establishment & Status</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Setelah fase IKEv2 selesai, terowongan IPsec berhasil terbentuk.
+                            Validasi dilakukan pada kedua <i>gateway</i> untuk memastikan status <strong>Phase 1
+                                (ISAKMP)</strong> dan <strong>Phase 2 (IPsec SA)</strong> telah aktif, menandakan jalur
+                            aman
+                            siap dilalui oleh data.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Grid Status OPNsense & MikroTik -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- OPNsense Status -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded border border-orange-500/30 font-mono backdrop-blur-sm z-10">
+                            HQ Status: Installed</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\gambarstatusopnsense.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x300/09090b/f97316?text=Gambar+Status+OPNsense';"
+                            alt="OPNsense IPsec Status"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- MikroTik Status -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-blue-500/20 text-blue-400 text-[10px] px-2 py-1 rounded border border-blue-500/30 font-mono backdrop-blur-sm z-10">
+                            Branch Status: Established</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\gambarstatusmikrotik.png"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x300/09090b/3b82f6?text=Gambar+Status+MikroTik';"
+                            alt="MikroTik Active Peers Status"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tahap 3: Secure Routing & Connectivity Validation -->
+            <div class="bento-card space-y-6 group border-emerald-500/20">
+                <div class="flex gap-4">
+                    <div class="step-number bg-emerald-500/10 border-emerald-500/30 text-emerald-400">03</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-emerald-400">Final Validation: Secure Routing</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Pengujian konektivitas <i>end-to-end</i> dilakukan antar terminal VPCS di
+                            kedua
+                            tempat. Fokus utamanya bukan sekadar pada keberhasilan <i>ping</i>, melainkan pada validasi
+                            jalur enkapsulasi menggunakan <i>traceroute</i>.
+                        </p>
+                        <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-800 text-sm text-gray-300 mt-2">
+                            Hasil <i>trace</i>
+                            membuktikan bahwa paket data dari HQ melompat ke <i>Gateway</i> OPNsense, lalu masuk ke
+                            dalam
+                            <i>tunnel</i> menuju IP Private tujuan. Alamat IP Publik Router ISP tidak terekam dalam
+                            rute,
+                            memastikan tidak ada kebocoran trafik ke internet.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gambar Terminal VPCS -->
+                <div
+                    class="img-container bg-black/60 p-2 border border-emerald-500/20 mt-4 max-w-4xl mx-auto relative cursor-crosshair">
+                    <div
+                        class="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded border border-emerald-500/30 font-mono backdrop-blur-sm z-10">
+                        HQ: VPCS Terminal</div>
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\vpcs_ping_trace.png"
+                        onerror="this.onerror=null; this.src='https://placehold.co/1000x500/09090b/10b981?text=Terminal+VPCS+Ping+Trace';"
+                        alt="Validasi Ping dan Trace IPsec VPN" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+        </section>
+
+        <div class="pillar-divider">
+            <span class="pillar-divider-text">SECURITY PLAN 03</span>
+        </div>
+
+        <!-- DEEP DIVE: PILLAR 3 - DNS SINKHOLE -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4 border-b border-gray-800 pb-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center font-bold text-orange-400 font-mono shadow-[0_0_15px_rgba(249,115,22,0.15)]">
+                    P3</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">DNS Sinkhole & Port 53 Enforcement</h2>
+                    <p class="text-sm text-gray-400 mt-1">Pemblokiran akses tingkat domain dan pencegahan bypass DNS
+                        oleh pengguna.</p>
+                </div>
+            </div>
+
+            <!-- Tahap 1: Konfigurasi Sinkhole -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number bg-orange-500/10 border-orange-500/30 text-orange-400">01</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-white">Sinkhole</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Untuk mencegah akses ke situs tertentu (seperti media sosial dan platform
+                            <i>gaming</i>), saya memanipulasi resolusi DNS lokal. Permintaan terhadap domain tertentu
+                            secara paksa diarahkan ke alamat IP <code
+                                class="bg-gray-800 text-orange-300 px-1 rounded">0.0.0.0</code> sehingga
+                            <i>browser</i> pengguna tidak akan pernah menemukan <i>server</i> asli dari situs tersebut.
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="img-container bg-black/60 p-2 border border-gray-800 mt-4 max-w-4xl mx-auto relative cursor-crosshair">
+                    <div
+                        class="absolute top-4 right-4 bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded border border-orange-500/30 font-mono backdrop-blur-sm z-10">
+                        OPNsense: Unbound DNS</div>
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\dnsoverrides.png"
+                        alt="Konfigurasi DNS Overrides OPNsense" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+
+            <!-- Tahap 2: Anti-Bypass Rule -->
+            <div class="bento-card space-y-6">
+                <div class="flex gap-4">
+                    <div class="step-number bg-orange-500/10 border-orange-500/30 text-orange-400">02</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-white">Anti-Bypass</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Pemblokiran DNS lokal sering kali mudah diakali oleh pengguna dengan cara mengubah DNS di PC
+                            mereka ke <i>Public DNS</i> (seperti 8.8.8.8 milik Google atau 1.1.1.1 milik cloudflare).
+                            Untuk mengatasi ini, saya
+                            menerapkan aturan <i>Firewall</i> yang memblokir semua trafik TCP/UDP Port 53 yang
+                            mencoba keluar menuju internet.
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="img-container bg-black/60 p-2 border border-gray-800 mt-4 max-w-4xl mx-auto relative cursor-crosshair">
+                    <div
+                        class="absolute top-4 right-4 bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded border border-orange-500/30 font-mono backdrop-blur-sm z-10">
+                        Firewall LAN Rules</div>
+                    <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\dnsrules.png"
+                        alt="Firewall Rule Blokir DNS Eksternal" class="w-full h-auto object-contain rounded-lg">
+                </div>
+            </div>
+
+            <!-- Tahap 3: Validasi Klien -->
+            <div class="bento-card space-y-6 group border-orange-500/20">
+                <div class="flex gap-4">
+                    <div class="step-number bg-emerald-500/10 border-emerald-500/30 text-emerald-400">03</div>
+                    <div class="space-y-2 w-full">
+                        <h3 class="text-xl font-bold text-emerald-400">Final Validation: Client Testing</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed text-justify">
+                            Pengujian dilakukan dari terminal VPCS HQ untuk memvalidasi dua lapis pertahanan yang
+                            telah dibuat.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- Bukti Sinkhole Bekerja -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded border border-emerald-500/30 font-mono backdrop-blur-sm z-10">
+                            Local DNS: Sinkholed</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\sinkholetest.png"
+                            alt="Tes Ping DNS Lokal"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+
+                    <!-- Bukti Bypass Gagal -->
+                    <div
+                        class="img-container bg-black/60 p-2 border border-gray-800 relative group/img cursor-crosshair h-48 flex items-center justify-center overflow-hidden">
+                        <div
+                            class="absolute top-2 right-2 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded border border-emerald-500/30 font-mono backdrop-blur-sm z-10">
+                            External DNS (8.8.8.8): Blocked</div>
+                        <img src="C:\Users\Yurico\Documents\Web Porto\gambar\PoC2\nypasstest.png"
+                            alt="Tes Bypass DNS Eksternal"
+                            class="w-full h-full object-cover object-left-top rounded-lg group-hover/img:scale-[1.05] transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+            class="py-10 text-center text-gray-500 text-sm flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-800/50 mt-16">
+            <p>© 2026 Designed & Engineered by <span class="text-gray-300 font-medium">Yurico</span>.</p>
+            <a href="landingPage.html"
+                class="text-rose-400 hover:text-rose-300 font-medium transition-colors flex items-center gap-1 group">
+                Kembali ke Portofolio
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                    </path>
+                </svg>
+            </a>
+        </footer>
+
+    </main>
+
+</body>
+
+</html>
